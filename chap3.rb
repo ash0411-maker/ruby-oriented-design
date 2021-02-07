@@ -1,18 +1,17 @@
 class Gear #チェーリングとコグ、比。
-  attr_reader :cahinring, :cog, :wheel
+  attr_reader :cahinring, :cog
 
-  def initialize(cahinring, cog, wheel=nil)
-    @cahinring = cahinring
-    @cog = cog
-    @wheel = wheel
+  def initialize(args)
+    @cahinring = args.fetch(:cahinring, 40)
+    @cog = args.fetch(:cog, 40)
   end
 
   def ratio
     cahinring / cog.to_f
   end
 
-  def gear_inches
-    ratio * wheel.diameter
+  def gear_inches(diameter)
+    ratio * diameter
   end
 end
 
@@ -22,11 +21,12 @@ end
 
 
 class Wheel
-  attr_reader :rim, :tire
+  attr_reader :rim, :tire, :gear
 
-  def initialize(rim, tire)
+  def initialize(rim, tire, cahinring, cog)
     @rim = rim
     @tire = tire
+    @gear = Gear.new({cahinring: => 52, cog: => 11})
   end
 
   def diameter
@@ -36,28 +36,12 @@ class Wheel
   def circumference
     diameter * Math::PI
   end
+
+  def gear_inches
+    gear.gear_inches(diameter)
+  end
 end
 
-@wheel = Wheel.new(26, 1.5)
-puts "# @wheel"
-puts @wheel.circumference
-
-
-puts "# gear_inches"
-puts Gear.new(52, 11, @wheel).gear_inches
-puts "# ratio"
-puts Gear.new(52, 11).ratio
-
-
-
-
-# class Obscuraring
-#   attr_reader :data
-#   def initialize(data)
-#     @data = data
-#   end
-
-#   def diameters
-#     data.collect { |cell| cell[0] + (cell[1] * 2) }
-#   end
-# end
+@wheel = Wheel.new(26, 1.5, 52, 11)
+puts @wheel.diameter
+puts @wheel.gear_inches
